@@ -134,7 +134,7 @@ app.get('/nearest-ngos', async (req, res) => {
   const { lat, lng } = req.query;
   
   try {
-    const result = await db.query('SELECT * FROM ngos');
+    const result = await db.query('SELECT * FROM ngos where is_active = true', []);
     const ngos = result.rows;
     
     const nearestNGOs = ngos.map(ngo => ({

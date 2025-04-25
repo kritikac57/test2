@@ -1,0 +1,39 @@
+<%- include('sidebar'); %>
+
+<div class="container mt-5">
+  <h2 class="mb-4">Edit NGO</h2>
+  <form action="/admin/edit-ngo/<%= ngo.id %>" method="POST">
+    <div class="mb-3">
+      <label for="name" class="form-label">NGO Name</label>
+      <input type="text" class="form-control" id="name" name="name" value="<%= ngo.name %>" required>
+    </div>
+    <div class="mb-3">
+      <label for="address" class="form-label">Address</label>
+      <input type="text" class="form-control" id="address" name="address" value="<%= ngo.address %>" required>
+    </div>
+    <div class="mb-3">
+      <label for="contact_number" class="form-label">Contact Number</label>
+      <input type="text" class="form-control" id="contact_number" name="contact_number" value="<%= ngo.contact_number %>" required>
+    </div>
+    <div class="mb-3">
+      <label for="location" class="form-label">Location</label>
+      <input type="text" class="form-control" id="location" name="location" value="<%= ngo.location %>" required>
+    </div>
+    <div class="mb-3">
+      <label for="latitude" class="form-label">Latitude</label>
+      <input type="text" class="form-control" id="latitude" name="latitude" value="<%= ngo.latitude %>" required>
+    </div>
+    <div class="mb-3">
+      <label for="longitude" class="form-label">Longitude</label>
+      <input type="text" class="form-control" id="longitude" name="longitude" value="<%= ngo.longitude %>" required>
+    </div>
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="is_active" name="is_active" <%= ngo.is_active ? 'checked' : '' %>>
+      <label class="form-check-label" for="is_active">Active</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Update NGO</button>
+    <a href="/admin/ngos" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+
+<%- include('footer'); %>

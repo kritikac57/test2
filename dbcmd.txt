@@ -1,18 +1,1 @@
-ALTER TABLE food_orders 
-ADD COLUMN status VARCHAR(50) DEFAULT 'pending',
-ADD COLUMN pickup_by VARCHAR(100),
-ADD COLUMN pickup_time TIMESTAMP;
-
--- If you haven't added the quantity column to food_items yet, add it:
-ALTER TABLE food_items
-ADD COLUMN quantity INTEGER DEFAULT 1;
-
-CREATE TABLE admin_users (
-  id SERIAL PRIMARY KEY,
-  username VARCHAR(50) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Insert a default admin user (you should change this password in production)
-INSERT INTO admin_users (username, password) VALUES ('admin', md5('password'));
+ALTER TABLE ngos ADD COLUMN is_active BOOLEAN DEFAULT false;

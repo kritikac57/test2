@@ -1,0 +1,63 @@
+<%- include('sidebar'); %>
+
+<div class="container mt-5">
+  <h2 class="mb-4">Manage NGOs</h2>
+  <a href="/add-ngo" class="btn btn-primary mb-3">Add New NGO</a>
+  <div class="row">
+    <% ngos.forEach(ngo => { %>
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title"><%= ngo.name %></h5>
+            <p class="card-text"><strong>Address:</strong> <%= ngo.address %></p>
+            <p class="card-text"><strong>Contact:</strong> <%= ngo.contact_number %></p>
+            <p class="card-text"><strong>Location:</strong> <%= ngo.location %></p>
+            <p class="card-text">
+              <strong>Coordinates:</strong> 
+              <%= ngo.latitude %>, <%= ngo.longitude %>
+            </p>
+            <p class="card-text">
+              <strong>Status:</strong> 
+              <span class="badge <%= ngo.is_active ? 'bg-success' : 'bg-danger' %>">
+                <%= ngo.is_active ? 'Active' : 'Inactive' %>
+              </span>
+            </p>
+            <div class="mt-3">
+              <a href="/admin/edit-ngo/<%= ngo.id %>" class="btn btn-sm btn-primary">Edit</a>
+              <button class="btn btn-sm <%= ngo.is_active ? 'btn-danger' : 'btn-success' %>" 
+                      onclick="toggleNgoStatus(<%= ngo.id %>, <%= ngo.is_active %>)">
+                <%= ngo.is_active ? 'Deactivate' : 'Activate' %>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</div>
+
+<script>
+function toggleNgoStatus(ngoId, currentStatus) {
+  fetch(`/admin/toggle-ngo-status/${ngoId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ is_active: !currentStatus }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert('Failed to update NGO status');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred while updating NGO status');
+  });
+}
+</script>
+
+<%- include('footer'); %>

@@ -348,5 +348,69 @@ router.post('/mark-donated/:id', async (req, res) => {
 });
 
 
+router.post('/admin/toggle-ngo-status/:id', async (req, res) => {
+  const ngoId = req.params.id;
+  const { is_active } = req.body;
+
+  try {
+    const result = await db.query(
+      'UPDATE ngos SET is_active = $1 WHERE id = $2 RETURNING *',
+      [is_active, ngoId]
+    );
+
+    if (result.rows.length > 0) {
+      res.json({ success: true, ngo: result.rows[0] });
+    } else {
+      res.status(404).json({ success: false, message: 'NGO not found' });
+    }
+  } catch (error) {
+    console.error('Error toggling NGO status:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+router.get('/admin/ngos', async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM ngos ORDER BY name');
+    const ngos = result.rows;
+    res.render('admin/ngos', { ngos, activePage: 'ngos' });
+  } catch (error) {
+    console.error('Error fetching NGOs:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+router.get('/admin/edit-ngo/:id', async (req, res) => {
+  try {
+    const ngoId = req.params.id;
+    const result = await db.query('SELECT * FROM ngos WHERE id = $1', [ngoId]);
+    
+    if (result.rows.length > 0) {
+      const ngo = result.rows[0];
+      res.render('admin/edit-ngo', { ngo, activePage: 'ngos' });
+    } else {
+      res.status(404).send('NGO not found');
+    }
+  } catch (error) {
+    console.error('Error fetching NGO:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+router.post('/admin/edit-ngo/:id', async (req, res) => {
+  try {
+    const ngoId = req.params.id;
+    const { name, address, contact_number, location, latitude, longitude, is_active } = req.body;
+    
+    await db.query(
+      'UPDATE ngos SET name = $1, address = $2, contact_number = $3, location = $4, latitude = $5, longitude = $6, is_active = $7 WHERE id = $8',
+      [name, address, contact_number, location, latitude, longitude, is_active === 'on', ngoId]
+    );
+    
+    res.redirect('/admin/ngos');
+  } catch (error) {
+    console.error('Error updating NGO:', error);
+    res.status(500).send('Server error');
+  }
+});
 
 module.exports = router;
