@@ -12,6 +12,7 @@
       border-bottom: 1px solid #eee;
     }
   </style>
+
 </head>
 <body>
   <div class="container mt-4">
@@ -37,7 +38,8 @@
           
           <div class="mb-3">
             <label for="address" class="form-label">Address</label>
-            <textarea class="form-control" id="address" name="address" rows="2" required></textarea>
+            <input type="text" class="form-control" id="address" name="address" required>
+            <button type="button" class="btn btn-outline-secondary mt-2" id="get-location-btn">Get My Location</button>
           </div>
           
           <h4 class="mb-3 mt-4">Food Items</h4>
@@ -86,6 +88,53 @@
       `;
       container.appendChild(newRow);
     });
+
+
+
   </script>
+  <head>
+    <!-- ... other head content ... -->
+    <script>
+      function initMap() {
+        // This function will be called when the API is loaded
+        const addressInput = document.getElementById('address');
+        const getLocationBtn = document.getElementById('get-location-btn');
+  
+        // Initialize Google Maps Autocomplete
+        const autocomplete = new google.maps.places.Autocomplete(addressInput);
+  
+        // Handle "Get My Location" button click
+        getLocationBtn.addEventListener('click', function() {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+              const lat = position.coords.latitude;
+              const lng = position.coords.longitude;
+  
+              // Use Geocoding service to get address from coordinates
+              const geocoder = new google.maps.Geocoder();
+              const latlng = { lat: lat, lng: lng };
+  
+              geocoder.geocode({ location: latlng }, function(results, status) {
+                if (status === 'OK') {
+                  if (results[0]) {
+                    addressInput.value = results[0].formatted_address;
+                  } else {
+                    alert('No address found for this location.');
+                  }
+                } else {
+                  alert('Geocoder failed due to: ' + status);
+                }
+              });
+            }, function() {
+              alert('Unable to retrieve your location');
+            });
+          } else {
+            alert('Geolocation is not supported by your browser');
+          }
+        });
+      }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCe3muyxbD76kazR-N7InHa2vwbNxPj9Wc&libraries=places&callback=initMap"></script>
+  </head>
 </body>
 </html>
