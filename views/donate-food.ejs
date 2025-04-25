@@ -26,6 +26,10 @@
             <input type="text" class="form-control" id="address" name="address" required>
             <button type="button" class="btn btn-outline-secondary mt-2" id="get-location-btn">Get My Location</button>
           </div>
+          <div id="nearest-ngos" class="mt-4" style="display: none;">
+            <h3>Nearest NGOs</h3>
+            <div id="ngo-list" class="row"></div>
+          </div>
           
           <h4 class="mb-3 mt-4">Food Items</h4>
           <div id="food-items-container">
@@ -81,28 +85,38 @@
 
     <script>
       function initMap() {
-        // This function will be called when the API is loaded
         const addressInput = document.getElementById('address');
         const getLocationBtn = document.getElementById('get-location-btn');
-  
+    
         // Initialize Google Maps Autocomplete
         const autocomplete = new google.maps.places.Autocomplete(addressInput);
-  
+    
+        // Show nearest NGOs when an address is selected
+        autocomplete.addListener('place_changed', function() {
+          const place = autocomplete.getPlace();
+          if (place.geometry) {
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+            showNearestNGOs(lat, lng);
+          }
+        });
+    
         // Handle "Get My Location" button click
         getLocationBtn.addEventListener('click', function() {
           if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
               const lat = position.coords.latitude;
               const lng = position.coords.longitude;
-  
+    
               // Use Geocoding service to get address from coordinates
               const geocoder = new google.maps.Geocoder();
               const latlng = { lat: lat, lng: lng };
-  
+    
               geocoder.geocode({ location: latlng }, function(results, status) {
                 if (status === 'OK') {
                   if (results[0]) {
                     addressInput.value = results[0].formatted_address;
+                    showNearestNGOs(lat, lng);
                   } else {
                     alert('No address found for this location.');
                   }
@@ -118,8 +132,33 @@
           }
         });
       }
+    
+      function showNearestNGOs(latitude, longitude) {
+        fetch(`/nearest-ngos?lat=${latitude}&lng=${longitude}`)
+          .then(response => response.json())
+          .then(ngos => {
+            const ngoList = document.getElementById('ngo-list');
+            ngoList.innerHTML = '';
+            ngos.forEach(ngo => {
+              const ngoCard = document.createElement('div');
+              ngoCard.className = 'col-md-4 mb-3';
+              ngoCard.innerHTML = `
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">${ngo.name}</h5>
+                    <p class="card-text">${ngo.address}</p>
+                    <p class="card-text">Distance: ${ngo.distance.toFixed(2)} km</p>
+                    <p class="card-text">Contact: ${ngo.contact_number}</p>
+                  </div>
+                </div>
+              `;
+              ngoList.appendChild(ngoCard);
+            });
+            document.getElementById('nearest-ngos').style.display = 'block';
+          })
+          .catch(error => console.error('Error:', error));
+      }
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCe3muyxbD76kazR-N7InHa2vwbNxPj9Wc&libraries=places&callback=initMap"></script>
-  </head>
 </body>
 </html>

@@ -206,6 +206,41 @@ app.post('/payment-callback', async (req, res) => {
   }
 });
 
+
+app.get('/nearest-ngos', async (req, res) => {
+  const { lat, lng } = req.query;
+  
+  try {
+    const result = await db.query('SELECT * FROM ngos');
+    const ngos = result.rows;
+    
+    const nearestNGOs = ngos.map(ngo => ({
+      ...ngo,
+      distance: calculateDistance(lat, lng, ngo.latitude, ngo.longitude)
+    }))
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, 3); // Get top 3 nearest NGOs
+    
+    res.json(nearestNGOs);
+  } catch (error) {
+    console.error('Error fetching nearest NGOs:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c; // Distance in km
+  return distance;
+}
+
 // Start the server
 const PORT = 8000;
 app.listen(PORT, () => {

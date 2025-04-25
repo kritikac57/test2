@@ -1,0 +1,27 @@
+<%- include('header'); %>
+
+<div class="container mt-5">
+  <h2 class="mb-4">Registered NGOs</h2>
+  <a href="/add-ngo" class="btn btn-primary mb-3">Add New NGO</a>
+  <div class="row">
+    <% ngos.forEach(ngo => { %>
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title"><%= ngo.name %></h5>
+            <p class="card-text"><strong>Address:</strong> <%= ngo.address %></p>
+            <p class="card-text"><strong>Contact:</strong> <%= ngo.contact_number %></p>
+            <p class="card-text"><strong>Location:</strong> <%= ngo.location %></p>
+            <p class="card-text">
+              <strong>Coordinates:</strong> 
+              <%= ngo.latitude %>, <%= ngo.longitude %>
+            </p>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</div>
+
+
+<%- include('footer'); %>

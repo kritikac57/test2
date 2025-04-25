@@ -1,0 +1,70 @@
+<%- include('header'); %>
+<br><br><br><br>
+<div class="container mt-5">
+  <h2 class="mb-4">Register NGO</h2>
+  <form action="/add-ngo" method="POST">
+    <div class="form-group">
+      <label for="ngo_name">NGO Name</label>
+      <input type="text" class="form-control" id="ngo_name" name="ngo_name" required>
+    </div>
+    <div class="form-group">
+      <label for="address">Address</label>
+      <input type="text" class="form-control" id="address" name="address" required>
+    </div>
+    <div class="form-group">
+      <label for="contact_number">Contact Number</label>
+      <input type="tel" class="form-control" id="contact_number" name="contact_number" required>
+    </div>
+    <div class="form-group">
+      <label for="location">Location</label>
+      <input type="text" class="form-control" id="location" name="location" required>
+    </div>
+    <div class="form-group">
+      <label for="latitude">Latitude</label>
+      <input type="number" step="any" class="form-control" id="latitude" name="latitude" required>
+    </div>
+    <div class="form-group">
+      <label for="longitude">Longitude</label>
+      <input type="number" step="any" class="form-control" id="longitude" name="longitude" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Register NGO</button>
+  </form>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCe3muyxbD76kazR-N7InHa2vwbNxPj9Wc&libraries=places"></script>
+<script>
+function initAutocomplete() {
+  var addressInput = document.getElementById('address');
+  var locationInput = document.getElementById('location');
+  var latitudeInput = document.getElementById('latitude');
+  var longitudeInput = document.getElementById('longitude');
+
+  var addressAutocomplete = new google.maps.places.Autocomplete(addressInput);
+  var locationAutocomplete = new google.maps.places.Autocomplete(locationInput);
+
+  addressAutocomplete.addListener('place_changed', fillInAddress);
+  locationAutocomplete.addListener('place_changed', fillInLocation);
+
+  function fillInAddress() {
+    var place = addressAutocomplete.getPlace();
+    if (!place.geometry) {
+      return;
+    }
+    latitudeInput.value = place.geometry.location.lat();
+    longitudeInput.value = place.geometry.location.lng();
+  }
+
+  function fillInLocation() {
+    var place = locationAutocomplete.getPlace();
+    if (!place.geometry) {
+      return;
+    }
+    latitudeInput.value = place.geometry.location.lat();
+    longitudeInput.value = place.geometry.location.lng();
+  }
+}
+
+google.maps.event.addDomListener(window, 'load', initAutocomplete);
+</script>
+
+<%- include('footer'); %>

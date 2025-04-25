@@ -176,5 +176,37 @@ router.post('/admin/update-order-status', async (req, res) => {
     console.error('Error updating order status:', error);
     res.status(500).json({ success: false, error: 'Server error' });
   }
+
+  
+});
+
+router.get('/add-ngo', (req, res) => {
+  res.render('add-ngo');
+});
+
+router.post('/add-ngo', async (req, res) => {
+  try {
+    const { ngo_name, address, contact_number, location, latitude, longitude } = req.body;
+    
+    await db.query(
+      'INSERT INTO ngos (name, address, contact_number, location, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6)',
+      [ngo_name, address, contact_number, location, latitude, longitude]
+    );
+    
+    res.redirect('/ngos'); // Redirect to a page showing all NGOs
+  } catch (error) {
+    console.error('Error adding NGO:', error);
+    res.status(500).send('Server error');
+  }
+});
+router.get('/ngos', async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM ngos ORDER BY name');
+    const ngos = result.rows;
+    res.render('ngos', { ngos });
+  } catch (error) {
+    console.error('Error fetching NGOs:', error);
+    res.status(500).send('Server error');
+  }
 });
 module.exports = router;
