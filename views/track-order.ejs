@@ -1,0 +1,43 @@
+<%- include('header'); %>
+
+<div class="container mt-5"  style="margin-top: 30vh;">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title text-center">Track Your Donation</h2>
+          <% if (locals.error) { %>
+            <div class="alert alert-danger"><%= error %></div>
+          <% } %>
+          <% if (!locals.order) { %>
+            <form action="/track-order" method="POST">
+              <div class="mb-3">
+                <label for="orderId" class="form-label">Enter your Order ID</label>
+                <input type="text" class="form-control" id="orderId" name="orderId" required>
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Track Order</button>
+              </div>
+            </form>
+          <% } else { %>
+            <h4>Order Details</h4>
+            <p><strong>Order ID:</strong> <%= order.id %></p>
+            <p><strong>Status:</strong> <%= order.status %></p>
+            <p><strong>Donor Name:</strong> <%= order.customer_name %></p>
+            <p><strong>Address:</strong> <%= order.address %></p>
+            <p><strong>Phone Number:</strong> <%= order.phone_number %></p>
+            <% if (order.pickup_by) { %>
+              <p><strong>Pickup By:</strong> <%= order.pickup_by %></p>
+            <% } %>
+            <div class="text-center mt-4">
+              <a href="/track-order" class="btn btn-primary">Track Another Order</a>
+              <a href="/" class="btn btn-secondary">Back to Home</a>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('footer'); %>

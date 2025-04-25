@@ -1,0 +1,24 @@
+<%- include('header'); %>
+<div id="parallax">
+</div>
+
+<div class="container" style="margin-top: 30vh;">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <h2 class="text-center">Thank You for Your Donation!</h2>
+          <p class="text-center">Your donation has been successfully submitted.</p>
+          <h4 class="text-center">Order ID: <%= orderId %></h4>
+          <p class="text-center">Please keep this Order ID for tracking your donation status.</p>
+          <div class="text-center" style="margin-top: 20px;">
+            <a href="/track-order" class="btn btn-primary">Track Your Donation</a>
+            <a href="/" class="btn btn-default">Back to Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('footer'); %>

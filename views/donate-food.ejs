@@ -8,7 +8,7 @@
     
     <div class="card">
       <div class="card-body">
-        <form action="/add" method="POST">
+        <form action="/add" method="POST" id="donationForm">
           <h4 class="mb-3">Donor Information</h4>
           <div class="row mb-3">
             <div class="col-md-6">
@@ -33,14 +33,21 @@
           
           <h4 class="mb-3 mt-4">Food Items</h4>
           <div id="food-items-container">
-            <div class="food-item-row row">
-              <div class="col-md-6">
+            <div class="food-item-row row mb-3">
+              <div class="col-md-4">
                 <label class="form-label">Item Name</label>
                 <input type="text" class="form-control" name="item_names[]" required>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-3">
                 <label class="form-label">Expiry Date</label>
                 <input type="date" class="form-control" name="expiry_dates[]" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Quantity</label>
+                <input type="number" class="form-control" name="quantities[]" min="1" required>
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-danger remove-item-btn">Remove</button>
               </div>
             </div>
           </div>
@@ -59,29 +66,74 @@
     </div>
   </div>
 
+  <div class="modal fade" id="thankYouModal" tabindex="-1" aria-labelledby="thankYouModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="thankYouModalLabel">Thank You for Your Donation!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Your donation has been successfully submitted.</p>
+          <p>Order ID: <strong id="orderId"></strong></p>
+          <p>You can use this Order ID to track the status of your donation.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <%- include('footer'); %>
    <script>
-    document.getElementById('add-item-btn').addEventListener('click', function() {
+    function addFoodItemRow() {
       const container = document.getElementById('food-items-container');
       const newRow = document.createElement('div');
-      newRow.className = 'food-item-row row';
+      newRow.className = 'food-item-row row mb-3';
       newRow.innerHTML = `
-        <div class="col-md-6">
+        <div class="col-md-4">
           <label class="form-label">Item Name</label>
           <input type="text" class="form-control" name="item_names[]" required>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
           <label class="form-label">Expiry Date</label>
           <input type="date" class="form-control" name="expiry_dates[]" required>
         </div>
+        <div class="col-md-3">
+          <label class="form-label">Quantity</label>
+          <input type="number" class="form-control" name="quantities[]" min="1" required>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="button" class="btn btn-danger remove-item-btn">Remove</button>
+        </div>
       `;
       container.appendChild(newRow);
+    }
+
+    document.getElementById('add-item-btn').addEventListener('click', addFoodItemRow);
+
+    document.getElementById('food-items-container').addEventListener('click', function(e) {
+      if (e.target.classList.contains('remove-item-btn')) {
+        e.target.closest('.food-item-row').remove();
+      }
     });
 
+    document.getElementById('donationForm').addEventListener('submit', function(e) {
+      // e.preventDefault();
+      // Simulate form submission and order ID generation
+      const orderId = 'DON' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      document.getElementById('orderId').textContent = orderId;
+      
+      // Show the thank you modal
+      const thankYouModal = new bootstrap.Modal(document.getElementById('thankYouModal'));
+      thankYouModal.show();
 
-
+      // Reset the form
+      this.reset();
+    });
   </script>
+
 
     <script>
       function initMap() {

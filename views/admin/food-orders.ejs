@@ -19,7 +19,7 @@
               <th>Phone</th>
               <th>Food Items</th>
               <th>Created At</th>
-              <th>Status</th>
+               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -40,7 +40,12 @@
                 <td><%= new Date(order.created_at).toLocaleString() %></td>
                 <td><%= order.status || 'Pending' %></td>
                 <td>
-                  <button class="btn btn-primary btn-sm update-status" data-order-id="<%= order.id %>">Update Status</button>
+                  <button class="btn btn-primary btn-sm update-status" 
+                  data-order-id="<%= order.id %>" 
+                  data-status="<%= order.status %>"
+                  data-pickup-by="<%= order.pickup_by || '' %>">
+            Update Status
+          </button>
                 </td>
               </tr>
             <% }); %>
@@ -51,7 +56,6 @@
   </div>
 </div>
 
-<!-- Status Update Modal -->
 <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -67,18 +71,17 @@
           <div class="form-group">
             <label for="status">Status:</label>
             <select class="form-control" id="status" name="status" required>
-              <option value="ready_to_collect">Ready to Collect</option>
-              <option value="collected">Collected</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="out_for_pickup">Out for Pickup</option>
+              <option value="assigned_for_pickup">Assigned for Pickup</option>
+              <option value="picked">Picked</option>
               <option value="donated">Donated</option>
             </select>
           </div>
-          <div id="collectionTimeGroup" class="form-group" style="display: none;">
-            <label for="collectionTime">Collection Time:</label>
-            <input type="datetime-local" class="form-control" id="collectionTime" name="collectionTime">
-          </div>
-          <div id="donationPlaceGroup" class="form-group" style="display: none;">
-            <label for="donationPlace">Donation Place:</label>
-            <input type="text" class="form-control" id="donationPlace" name="donationPlace">
+          <div id="pickupByGroup" class="form-group" style="display: none;">
+            <label for="pickupBy">Pickup Person's Name:</label>
+            <input type="text" class="form-control" id="pickupBy" name="pickupBy">
           </div>
         </form>
       </div>
@@ -89,19 +92,25 @@
     </div>
   </div>
 </div>
-<%- include('footer'); %>
+
+<%- include('footer');%>
+
 <script>
 $(document).ready(function() {
   $('.update-status').on('click', function() {
     const orderId = $(this).data('order-id');
+    const currentStatus = $(this).data('status');
+    const pickupBy = $(this).data('pickup-by');
     $('#orderId').val(orderId);
+    $('#status').val(currentStatus);
+    $('#pickupBy').val(pickupBy);
+    $('#pickupByGroup').toggle(currentStatus === 'out_for_pickup' || currentStatus === 'assigned_for_pickup');
     $('#statusModal').modal('show');
   });
 
   $('#status').on('change', function() {
     const status = $(this).val();
-    $('#collectionTimeGroup').toggle(status === 'ready_to_collect');
-    $('#donationPlaceGroup').toggle(status === 'donated');
+    $('#pickupByGroup').toggle(status === 'out_for_pickup' || status === 'assigned_for_pickup');
   });
 
   $('#saveStatus').on('click', function() {
@@ -117,4 +126,3 @@ $(document).ready(function() {
   });
 });
 </script>
-

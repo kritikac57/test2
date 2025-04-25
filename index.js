@@ -5,11 +5,17 @@ const db = require('./db/connection');
 const path = require('path');
 const crypto = require('crypto');
 const axios = require('axios'); 
+const session = require('express-session');
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
+app.use(session({
+  secret: 'login12345',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Set to true if using https
+}));
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -106,89 +112,6 @@ app.post('/donation-callback', async (req, res) => {
   }
 });
 
-app.post('/initiate-payment22', async (req, res) => {
-  const { customer_name, address, phone_number, item_names, expiry_dates, amount } = req.body;
-  
-  // Generate a unique transaction ID
-  const transactionId = 'TX' + Date.now();
-
-  // PhonePe test credentials
-  const merchantId = 'PGTESTPAYUAT77';
-  const saltKey = '14fa5465-f8a7-443f-8477-f986b8fcfde9';
-  const saltIndex = 1;
-
-  // Prepare the payload
-  const payload = {
-    merchantId: merchantId,
-    merchantTransactionId: transactionId,
-    merchantUserId: 'MUID' + Date.now(),
-    amount: amount * 100, // amount in paise
-    redirectUrl: `http://localhost:8000/payment-callback`,
-    redirectMode: 'POST',
-    callbackUrl: `http://localhost:8000/payment-callback`,
-    mobileNumber: phone_number,
-    paymentInstrument: {
-      type: 'PAY_PAGE'
-    }
-  };
-
-  const payloadString = JSON.stringify(payload);
-  const payloadBase64 = Buffer.from(payloadString).toString('base64');
-
-  // Generate X-VERIFY header
-  const string = payloadBase64 + '/pg/v1/pay' + saltKey;
-  const sha256 = crypto.createHash('sha256').update(string).digest('hex');
-  const xVerify = sha256 + '###' + saltIndex;
-
-  try {
-    // Start a transaction
-    await db.query('BEGIN');
-
-    // Insert the order with status 'pending'
-    const orderResult = await db.query(
-      'INSERT INTO food_orders (customer_name, address, phone_number, status) VALUES ($1, $2, $3, $4) RETURNING id',
-      [customer_name, address, phone_number, 'pending']
-    );
-    
-    const orderId = orderResult.rows[0].id;
-    
-    // Insert food items
-    const itemNames = Array.isArray(item_names) ? item_names : [item_names];
-    const expiryDates = Array.isArray(expiry_dates) ? expiry_dates : [expiry_dates];
-    
-    for (let i = 0; i < itemNames.length; i++) {
-      if (itemNames[i] && expiryDates[i]) {
-        await db.query(
-          'INSERT INTO food_items (order_id, item_name, expiry_date) VALUES ($1, $2, $3)',
-          [orderId, itemNames[i], expiryDates[i]]
-        );
-      }
-    }
-
-    // Commit the transaction
-    await db.query('COMMIT');
-
-    const response = await axios.post(
-      'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
-      {
-        request: payloadBase64
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-VERIFY': xVerify
-        }
-      }
-    );
-
-    // Redirect to PhonePe payment page
-    res.redirect(response.data.data.instrumentResponse.redirectInfo.url);
-  } catch (error) {
-    await db.query('ROLLBACK');
-    console.error('Error initiating payment:', error);
-    res.status(500).send('Error initiating payment');
-  }
-});
 
 app.post('/payment-callback', async (req, res) => {
   // Handle the payment callback
