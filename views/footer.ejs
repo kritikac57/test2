@@ -21,4 +21,57 @@
 <script src="/assets/js/validate.js"></script>
 <script src="/assets/js/common.js"></script>
 </body>
+<script>
+  function validateForm() {
+    let isValid = true;
+    const nameInput = document.getElementById('name');
+    const phoneInput = document.getElementById('phone_number');
+    const emailInput = document.getElementById('email');
+
+    // Validate Name
+    if (!/^[a-zA-Z\s]{2,}$/.test(nameInput.value.trim())) {
+      isValid = false;
+      iziToast.error({
+        title: 'Error',
+        message: 'Please enter a valid name (at least 2 characters, letters only)',
+        position: 'topRight'
+      });
+      nameInput.focus();
+      return false;
+    }
+
+    // Validate Phone Number (assuming a 10-digit format)
+    if (!/^\d{10}$/.test(phoneInput.value.trim())) {
+      isValid = false;
+      iziToast.error({
+        title: 'Error',
+        message: 'Please enter a valid 10-digit phone number',
+        position: 'topRight'
+      });
+      phoneInput.focus();
+      return false;
+    }
+
+    // Validate Email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim())) {
+      isValid = false;
+      iziToast.error({
+        title: 'Error',
+        message: 'Please enter a valid email address',
+        position: 'topRight'
+      });
+      emailInput.focus();
+      return false;
+    }
+
+    return isValid;
+  }
+
+  document.querySelector('form').addEventListener('submit', function(e) {
+	// alert('yess');
+    if (!validateForm()) {
+      e.preventDefault();
+    }
+  });
+</script>
 </html>
