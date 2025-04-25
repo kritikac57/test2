@@ -33,8 +33,8 @@ router.get('/', async (req, res) => {
 });
 
 // Display the form to add a new food order
-router.get('/add', (req, res) => {
-  res.render('add_order');
+router.get('/donate-food', (req, res) => {
+  res.render('donate-food');
 });
 
 // Process the form submission
@@ -100,7 +100,7 @@ router.get('/donate', (req, res) => {
   });
   
   // Display all donations
-  router.get('/donations', async (req, res) => {
+  router.get('/admin/donations', async (req, res) => {
     try {
       const donationsResult = await db.query(`
         SELECT id, name, email, phone_number, amount, created_at
@@ -113,16 +113,68 @@ router.get('/donate', (req, res) => {
       // Calculate total amount
       const totalAmount = donations.reduce((sum, donation) => sum + parseFloat(donation.amount), 0);
       
-      res.render('donations', { donations, totalAmount });
+      res.render('admin/donations', { donations, totalAmount, activePage: 'donations' });
     } catch (error) {
       console.error('Error fetching donations:', error);
       res.status(500).send('Server error');
     }
   });
    
-  router.get('/sidebar', (req, res) => {
-    res.render('sidebar');
-  });
 
+  router.get('/admin', (req, res) => {
+    res.render('admin/index',{ activePage: 'dashboard' });
+  }); 
+router.get('/admin/food-orders', async (req, res) => {
+  try {
+    const ordersResult = await db.query(`
+      SELECT o.id, o.customer_name, o.address, o.phone_number, o.created_at, o.status
+      FROM food_orders o
+      ORDER BY o.created_at DESC
+    `);
+    
+    const orders = ordersResult.rows;
+    
+    // Get food items for each order
+    for (const order of orders) {
+      const itemsResult = await db.query(`
+        SELECT id, item_name, expiry_date
+        FROM food_items
+        WHERE order_id = $1
+        ORDER BY expiry_date
+      `, [order.id]);
+      
+      order.food_items = itemsResult.rows;
+    }
+    
+    res.render('admin/food-orders', { orders, activePage: 'food-orders' });
+  } catch (error) {
+    console.error('Error fetching food orders:', error);
+    res.status(500).send('Server error');
+  }
+});
 
+router.post('/admin/update-order-status', async (req, res) => {
+  try {
+    const { orderId, status, collectionTime, donationPlace } = req.body;
+    let updateQuery = 'UPDATE food_orders SET status = $1';
+    let queryParams = [status];
+
+    if (status === 'ready_to_collect') {
+      updateQuery += ', collection_time = $2';
+      queryParams.push(collectionTime);
+    } else if (status === 'donated') {
+      updateQuery += ', donation_place = $2';
+      queryParams.push(donationPlace);
+    }
+
+    updateQuery += ' WHERE id = $' + (queryParams.length + 1);
+    queryParams.push(orderId);
+
+    await db.query(updateQuery, queryParams);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
 module.exports = router;
