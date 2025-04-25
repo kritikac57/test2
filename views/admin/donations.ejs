@@ -21,6 +21,7 @@
                   <th>Phone</th>
                   <th>Amount</th>
                   <th>Date</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -32,6 +33,8 @@
                     <td><%= donation.phone_number %></td>
                     <td class="donation-amount">$<%= parseFloat(donation.amount).toFixed(2) %></td>
                     <td><%= new Date(donation.created_at).toLocaleString() %></td>
+
+                    <td><%= donation.status %></td>
                   </tr>
                 <% }); %>
               </tbody>
@@ -39,7 +42,7 @@
                 <tr class="table-primary">
                   <td colspan="4" class="text-end"><strong>Total Donations:</strong></td>
                   <td class="donation-amount">$<%= totalAmount.toFixed(2) %></td>
-                  <td></td>
+                  <td colspan="2"></td>
                 </tr>
               </tfoot>
             </table>

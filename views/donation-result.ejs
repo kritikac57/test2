@@ -1,0 +1,97 @@
+<%- include('header'); %>
+
+<div class="container mt-5">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<style>
+  .success-animation, .error-animation {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 40px;
+  }
+  .checkmark__circle, .crossmark__circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: #7ac142;
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+  }
+  .crossmark__circle {
+    stroke: #fc3d39;
+  }
+  .checkmark, .crossmark {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2;
+    stroke: #fff;
+    stroke-miterlimit: 10;
+    box-shadow: inset 0px 0px 0px #7ac142;
+    animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+  }
+  .crossmark {
+    box-shadow: inset 0px 0px 0px #fc3d39;
+  }
+  .checkmark__check, .crossmark__path {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+  }
+  @keyframes stroke {
+    100% { stroke-dashoffset: 0; }
+  }
+  @keyframes scale {
+    0%, 100% { transform: none; }
+    50% { transform: scale3d(1.1, 1.1, 1); }
+  }
+  @keyframes fill {
+    100% { box-shadow: inset 0px 0px 0px 80px #7ac142; }
+  }
+  .crossmark { animation: fill-red .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both; }
+  @keyframes fill-red {
+    100% { box-shadow: inset 0px 0px 0px 80px #fc3d39; }
+  }
+</style>
+  <div class="row justify-content-center">
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="col-md-12">
+      <div class="card shadow-lg border-0 rounded-lg mt-5">
+        <div class="card-body text-center p-5">
+          <% if (status === 'completed') { %>
+            <div class="success-animation">
+              <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+              </svg>
+            </div>
+            <h1 class="display-4 text-success mb-4 animate__animated animate__fadeInUp">Thank You!</h1>
+            <p class="lead animate__animated animate__fadeInUp animate__delay-1s">Your donation has been successfully processed. Your generosity will make a real difference in someone's life.</p>
+            <p class="mb-4 animate__animated animate__fadeInUp animate__delay-2s">We've sent a confirmation email to your registered email address.</p>
+            <a href="/" class="btn btn-success btn-lg animate__animated animate__fadeInUp animate__delay-3s">Return to Home</a>
+          <% } else { %>
+            <div class="error-animation">
+              <svg class="crossmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="crossmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="crossmark__path" fill="none" d="M16,16 L36,36 M36,16 L16,36"/>
+              </svg>
+            </div>
+            <h1 class="display-4 text-danger mb-4 animate__animated animate__fadeInUp">Oops!</h1>
+            <p class="lead animate__animated animate__fadeInUp animate__delay-1s">We're sorry, but there was an issue processing your donation.</p>
+            <p class="mb-4 animate__animated animate__fadeInUp animate__delay-2s">Please try again or contact our support team if the problem persists.</p>
+            <a href="/donate" class="btn btn-danger btn-lg animate__animated animate__fadeInUp animate__delay-3s">Try Again</a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('footer'); %>

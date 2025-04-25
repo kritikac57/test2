@@ -44,6 +44,15 @@
     background-color: #45a049;
     border-color: #45a049;
   }
+  .phonepe-btn {
+    background-color: #5f259f;
+    color: white;
+    border-color: #5f259f;
+  }
+  .phonepe-btn:hover {
+    background-color: #4a1d7a;
+    border-color: #4a1d7a;
+  }
 </style>
 
 <div class="container mt-5">
@@ -58,7 +67,7 @@
       <p class="lead mb-0">Your contribution helps us provide food to those in need</p>
     </div>
     <div class="card-body p-4">
-      <form action="/donate" method="POST">
+      <form id="donationForm" action="/initiate-payment" method="POST">
         <div class="row mb-4">
           <div class="col-md-6">
             <label for="name" class="form-label">Full Name</label>
@@ -100,7 +109,9 @@
         </div>
         
         <div class="d-grid gap-2">
-          <button type="submit" class="btn btn-primary btn-lg">Complete Donation</button>
+          <button type="submit" class="btn btn-primary btn-lg" id="completeBtn">Complete Donation</button>
+          <!-- <button type="button" class="btn phonepe-btn btn-lg" id="phonePeBtn">Pay with PhonePe</button> -->
+        
         </div>
       </form>
     </div>
@@ -116,42 +127,49 @@
 
 
 <%- include('footer'); %>
-
 <script>
-    // Handle donation amount selection
-    const amountBtns = document.querySelectorAll('.amount-btn');
-    const customAmountBtn = document.getElementById('custom-amount-btn');
-    const customAmountContainer = document.getElementById('custom-amount-container');
-    const amountInput = document.getElementById('amount');
-    
-    amountBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        // Remove active class from all buttons
-        amountBtns.forEach(b => b.classList.remove('active'));
-        
-        // Add active class to clicked button
-        this.classList.add('active');
-        
-        // Set the amount value
-        const amount = this.getAttribute('data-amount');
-        amountInput.value = amount;
-        
-        // Hide custom amount input
-        customAmountContainer.style.display = 'none';
-      });
-    });
-    
-    customAmountBtn.addEventListener('click', function() {
+  // Handle donation amount selection
+  const amountBtns = document.querySelectorAll('.amount-btn');
+  const customAmountBtn = document.getElementById('custom-amount-btn');
+  const customAmountContainer = document.getElementById('custom-amount-container');
+  const amountInput = document.getElementById('amount');
+  
+  amountBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
       // Remove active class from all buttons
-      amountBtns.forEach(btn => btn.classList.remove('active'));
+      amountBtns.forEach(b => b.classList.remove('active'));
       
-      // Show custom amount input
-      customAmountContainer.style.display = 'block';
+      // Add active class to clicked button
+      this.classList.add('active');
       
-      // Clear and focus the input
-      amountInput.value = '';
-      amountInput.focus();
+      // Set the amount value
+      const amount = this.getAttribute('data-amount');
+      amountInput.value = amount;
+      
+      // Hide custom amount input
+      customAmountContainer.style.display = 'none';
     });
-  </script>
+  });
+  
+  customAmountBtn.addEventListener('click', function() {
+    // Remove active class from all buttons
+    amountBtns.forEach(btn => btn.classList.remove('active'));
+    
+    // Show custom amount input
+    customAmountContainer.style.display = 'block';
+    
+    // Clear and focus the input
+    amountInput.value = '';
+    amountInput.focus();
+  });
+
+  document.getElementById('donationForm').addEventListener('submit', function(e) {
+    const amount = amountInput.value;
+    if (!amount || amount < 1) {
+      e.preventDefault();
+      alert('Please enter a valid amount');
+    }
+  });
+</script>
 </body>
 </html>

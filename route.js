@@ -103,7 +103,7 @@ router.get('/donate', (req, res) => {
   router.get('/admin/donations', async (req, res) => {
     try {
       const donationsResult = await db.query(`
-        SELECT id, name, email, phone_number, amount, created_at
+        SELECT id, name, email, phone_number, amount, created_at,status
         FROM donations
         ORDER BY created_at DESC
       `);
